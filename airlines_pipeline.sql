@@ -4,7 +4,10 @@ SELECT * FROM cloud_files("/databricks-datasets/asa/airlines", "csv", map("heade
 
 -- COMMAND ----------
 
-CREATE STREAMING LIVE TABLE silver_delays AS
+CREATE STREAMING LIVE TABLE silver_delays (
+CONSTRAINT arr_delay_is_numeric EXPECT (try_cast(ArrDelay AS DOUBLE) IS NOT NULL) ON VIOLATION DROP ROW,
+CONSTRAINT dep_delay_is_numeric EXPECT (try_cast(DepDelay AS DOUBLE) IS NOT NULL) ON VIOLATION DROP ROW)
+AS
 SELECT Year, Month, DayofMonth, UniqueCarrier, ArrDelay, DepDelay
 FROM STREAM(LIVE.bronze)
 
